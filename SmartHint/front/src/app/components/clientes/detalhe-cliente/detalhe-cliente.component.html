@@ -1,0 +1,215 @@
+<div class="grid p-2">
+  <p-toast />
+  <div class="card col-12">
+    <div class="col-12 flex justify-content-start gap-2">
+      {{ id != null && id != 0 ? 'Editar Cliente' : 'Adicionar Cliente' }}
+    </div>
+    <div class="col-12">
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <p-fieldset legend="Informações Básicas" class="m-3 p-fluid">
+          <div class="field">
+            <label for="nome">Nome/Razão Social</label>
+            <input 
+              type="text" 
+              pInputText 
+              id="nome" 
+              [(ngModel)]="costumer.nome_razao" 
+              formControlName="nome_razao"
+              required 
+              autofocus />
+            <small class="p-error" *ngIf="f.nome_razao.errors?.required">
+              Nome/Razão Social é obrigatório.
+            </small>
+            <small class="p-error" *ngIf="f.nome_razao.errors?.maxlength">
+              Nome/Razão Social deve ter no máximo 150 caracteres.
+            </small>
+          </div>
+          <div class="field">
+            <label for="email">E-mail</label>
+            <input 
+              type="email" 
+              pInputText 
+              id="email" 
+              [(ngModel)]="costumer.email"
+              (blur)="verifyEmail()"
+              formControlName="email"
+              required />
+            <small class="p-error" *ngIf="f.email.errors?.required">
+              E-mail é obrigatório.
+            </small>
+            <small class="p-error" *ngIf="f.email.errors?.email">
+              E-mail inválido.
+            </small>
+            <small class="p-error" *ngIf="f.email.errors?.maxlength">
+             E-mail deve ter no máximo 150 caracteres.
+            </small>
+          </div>
+          <div class="field">
+            <label for="telefone">Telefone</label>
+            <p-inputMask 
+              id="telefone" 
+              mask="(99) 9 9999-9999"
+              placeholder="(99) 9 9999-9999"
+              [(ngModel)]="costumer.telefone"
+              formControlName="telefone"
+              unmask="true" 
+              required />
+            <small class="p-error" *ngIf="f.telefone.errors?.required">
+              Telefone é obrigatório.
+            </small>
+            <small class="p-error" *ngIf="f.telefone.errors?.maxlength">
+              E-mail deve ter no máximo 11 caracteres.
+            </small>
+          </div>
+        </p-fieldset>
+        <p-fieldset legend="Informações Pessoais" class="m-3 p-fluid">
+          <div class="field">
+            <label for="telefone">Tipo de Pessoa</label>
+            <p-dropdown 
+              [options]="personTypes" 
+              [(ngModel)]="costumer.tipoPessoa" 
+              formControlName="tipoPessoa"
+              optionLabel="nome"
+              optionValue="id"
+              placeholder="Selecione..." 
+              (onChange)="toogleContainer($event.value)"/>
+            <small class="p-error" *ngIf="f.tipoPessoa.errors?.required">
+              Tipo de Pessoa é obrigatório.
+            </small>
+          </div>
+          <div class="field">
+            <label for="cpf_cnpj">CPF/CNPJ</label>
+            <p-inputMask 
+              id="cpf_cnpj" 
+              [mask]="mask"
+              [placeholder]="mask"
+              [(ngModel)]="costumer.cpf_cnpj"
+              formControlName="cpf_cnpj"
+              (onBlur)="verifyCpfCnpj()"
+              unmask="true" 
+              required />
+              <small class="p-error" *ngIf="f.cpf_cnpj.errors?.required">
+                CPF/CNPJ é obrigatório.
+              </small>
+            <small class="p-error" *ngIf="f.cpf_cnpj.errors?.minlength">
+              CPF/CNPJ deve ter no mínimo 11 caracteres.
+            </small>
+            <small class="p-error" *ngIf="f.cpf_cnpj.errors?.maxlength">
+              CPF/CNPJ deve ter no máximo 14 caracteres.
+            </small>
+          </div>
+          <div class="field">
+            <div *ngIf="!showContainer">
+              <label for="inscricao_estadual">Inscrição Estadual</label>
+              <p-inputMask 
+                id="inscricao_estadual" 
+                mask="999.999.999-999"
+                placeholder="999.999.999-999"
+                [(ngModel)]="costumer.inscricao_estadual"
+                formControlName="inscricao_estadual"
+                unmask="true" 
+                required />
+              <small class="p-error" *ngIf="f.inscricao_estadual.errors?.required">
+                Inscrição Estadual é obrigatória.
+              </small>
+              <small class="p-error" *ngIf="f.inscricao_estadual.errors?.minlength || f.inscricao_estadual.errors?.maxlength">
+                Inscrição Estadual deve possuir 14 caracteres.
+              </small>
+            </div>
+          </div>
+          <div *ngIf="showContainer">
+            <div class="field">
+              <label for="gender">Gênero</label>
+              <p-dropdown 
+                id="gender"
+                [options]="genders" 
+                [(ngModel)]="costumer.genero" 
+                formControlName="genero"
+                optionLabel="nome"
+                optionValue="id"
+                placeholder="Selecione..." />
+              <small class="p-error" *ngIf="f.genero.errors?.required">
+                Gênero é obrigatório.
+              </small>
+            </div>
+            <div class="field">
+              <label for="data_nascimento">Data de Nascimento</label>
+              <p-calendar 
+                id="data_nascimento"
+                [(ngModel)]="costumer.data_nascimento"
+                formControlName="data_nascimento"
+                dateFormat="dd/mm/yy"
+                [iconDisplay]="'input'"
+                [showIcon]="true"
+                />
+              <small class="p-error" *ngIf="f.data_nascimento.errors?.required">
+                Data de Nascimento é obrigatório.
+              </small>
+            </div>
+          </div>
+        </p-fieldset>
+        <p-fieldset legend="Senha de Acesso" class="m-3 p-fluid">
+          <div class="field">
+            <label for="senha">Insira a Senha</label>
+            <p-password 
+              id="senha"
+              [(ngModel)]="costumer.senha"
+              formControlName="senha"
+              mediumRegex="^.{5,8}$"
+              strongRegex="^.{8,16}$"
+              [toggleMask]="true"
+              >
+              <ng-template pTemplate="footer">
+                <p-divider />
+                <p class="mt-2">Regras</p>
+                <ul class="pl-2 ml-2 mt-0" style="line-height: 1.5">
+                  <li>Mínino 8 characteres</li>
+                  <li>Máximo 16 characteres</li>
+                </ul>
+              </ng-template>
+            </p-password>
+            <small class="p-error" *ngIf="f.senha.errors?.required">
+              Senha é obrigatória.
+            </small>
+            <small class="p-error" *ngIf="f.senha.errors?.minLength">
+              Mínino 8 characteres.
+            </small>
+            <small class="p-error" *ngIf="f.senha.errors?.maxLength">
+              Mínino 16 characteres.
+            </small>
+          </div>
+          <div class="field">
+            <label for="confirme_senha">Confirme a Senha</label>
+            <p-password 
+              id="confirme_senha"
+              [(ngModel)]="password_aux" 
+              formControlName="confirme_senha"
+              [feedback]="false"
+              [toggleMask]="true" />
+            <small class="p-error" *ngIf="f.confirme_senha.errors?.required">
+              Confirme a senha.
+            </small>
+            <small class="p-error" *ngIf="costumer.senha != null && costumer.senha != password_aux">
+              As senhas não coincidem.
+            </small>
+          </div>
+        </p-fieldset>
+        <p-fieldset legend="Situação do Cliente" class="m-3">
+          <div class="field">
+            <label for="data_nascimento">Bloqueado</label>
+            <p-selectButton
+              [options]="situation" 
+              [(ngModel)]="costumer.bloqueado"
+              formControlName="bloqueado"
+              optionLabel="label" 
+              optionValue="value" />
+          </div>
+        </p-fieldset>
+        <div class="p-fluid flex justify-content-end gap-2">
+          <p-button label="Cancelar" iconPos="right" icon="pi pi-times" size="small" [outlined]="true" severity="danger" (onClick)="cancel()" />
+          <p-button label="Salvar" iconPos="right" icon="pi pi-plus" size="small" [outlined]="true" severity="success" type="submit" />
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
